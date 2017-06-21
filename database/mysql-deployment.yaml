@@ -17,13 +17,19 @@ spec:
           name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: root
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-passwords
+                  key: root
             - name: MYSQL_DATABASE
               value: ghost
             - name: MYSQL_USER
               value: ghost
             - name: MYSQL_PASSWORD
-              value: myp4ss
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-passwords
+                  key: ghost
           ports:
             - containerPort: 3306
               name: mysql
@@ -38,7 +44,9 @@ spec:
           readinessProbe:
             initialDelaySeconds: 10
             exec:
-              command: ["mysqladmin", "status", "-proot"]
+              command:
+                - "mysqladmin"
+                - "ping"
       volumes:
         - name: mysql-data
           persistentVolumeClaim:
